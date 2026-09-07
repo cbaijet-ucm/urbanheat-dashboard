@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-09-01T18:07:08.341533+00:00",
+  "artifacts": [
+    {
+      "name": "scene_catalog.csv",
+      "path": "assets/summaries/scene_catalog.csv",
+      "source": "00_Datasets/metadata/scene_catalog.csv",
+      "transformation": "copy",
+      "size_bytes": 11825,
+      "sha256": "e675cc483782bb9e35fb67e59c12bda5052b721f4c02bd332323f973091a7acc",
+      "crs": null
+    },
+    {
+      "name": "feature_summary.csv",
+      "path": "assets/summaries/feature_summary.csv",
+      "source": "00_Datasets/processed/cell_date_dataset/dataset_summary.csv",
+      "transformation": "drop_mode_column",
+      "size_bytes": 4312,
+      "sha256": "53999fc0b4d1d3abb4da95132e5084b694bb8c62d82cba247b218d6f935051c4",
+      "crs": null
+    },
+    {
+      "name": "bcn_epsg4326.geojson",
+      "path": "assets/maps/bcn_epsg4326.geojson",
+      "source": "00_Datasets/processed/boundaries/bcn_epsg4326.geojson",
+      "transformation": "copy",
+      "size_bytes": 240457,
+      "sha256": "cefe2e441940a7d0a36cb7fb5a87eca43d084e25c1e89f03b29f6b7ea160dc12",
+      "crs": "EPSG:4326"
+    },
+    {
+      "name": "bcn_1km_epsg4326.geojson",
+      "path": "assets/maps/bcn_1km_epsg4326.geojson",
+      "source": "00_Datasets/processed/boundaries/bcn_1km_epsg4326.geojson",
+      "transformation": "copy",
+      "size_bytes": 40173,
+      "sha256": "c80d5455647054ac737e0403295f8387811993cb872147c10197518b7c68fa40",
+      "crs": "EPSG:4326"
+    }
+  ],
+  "missing": []
+}

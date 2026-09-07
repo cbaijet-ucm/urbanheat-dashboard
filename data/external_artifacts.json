@@ -1,0 +1,11 @@
+[
+  {"source": "00_Datasets/metadata/scene_catalog.csv", "derived": "assets/summaries/scene_catalog.csv", "required": true, "method": "copy"},
+  {"source": "00_Datasets/processed/cell_date_dataset/dataset_summary.csv", "derived": "assets/summaries/feature_summary.csv", "required": true, "method": "drop_mode_column"},
+  {"source": "00_Datasets/processed/boundaries/bcn_epsg4326.geojson", "derived": "assets/maps/bcn_epsg4326.geojson", "required": true, "method": "copy"},
+  {"source": "00_Datasets/processed/boundaries/bcn_1km_epsg4326.geojson", "derived": "assets/maps/bcn_1km_epsg4326.geojson", "required": true, "method": "copy"},
+  {"source": "00_Datasets/processed/boundaries/barris_epsg4326.geojson", "derived": "assets/maps/barris_epsg4326.geojson", "required": false, "method": "copy"},
+  {"source": "05_Models/tabular_two_stage/model_manifest.json", "derived": "assets/summaries/tabular_model_manifest.json", "required": false, "method": "copy"},
+  {"source": "06_Results/metrics/tabular_two_stage/test_macro_metrics.csv", "derived": "assets/summaries/tabular_test_metrics.csv", "required": false, "method": "copy"},
+  {"source": "06_Results/metrics/tabular_two_stage/test_scene_metrics.csv", "derived": "assets/summaries/tabular_scene_metrics.csv", "required": false, "method": "copy"},
+  {"source": "06_Results/metrics/cnn_runs/cnn_runs_summary.csv", "derived": "assets/summaries/cnn_runs_summary.csv", "required": false, "method": "copy"}
+]

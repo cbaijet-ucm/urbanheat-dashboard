@@ -1,0 +1,96 @@
+{
+  "bounds": [
+    [
+      41.308080848161794,
+      2.0404297761826444
+    ],
+    [
+      41.47735218196047,
+      2.239909255026971
+    ]
+  ],
+  "scenes": [
+    {
+      "id": "LC08_L2SP_197031_20260404_20260415_02_T1",
+      "date": "2026-04-04",
+      "xgboost": "2026-04-04_xgboost.png",
+      "cnn": "2026-04-04_cnn.png",
+      "range_celsius": [
+        13.0,
+        56.0
+      ]
+    },
+    {
+      "id": "LC08_L2SP_197031_20260623_20260706_02_T1",
+      "date": "2026-06-23",
+      "xgboost": "2026-06-23_xgboost.png",
+      "cnn": "2026-06-23_cnn.png",
+      "range_celsius": [
+        13.0,
+        56.0
+      ]
+    },
+    {
+      "id": "LC08_L2SP_198031_20250830_20250903_02_T1",
+      "date": "2025-08-30",
+      "xgboost": "2025-08-30_xgboost.png",
+      "cnn": "2025-08-30_cnn.png",
+      "range_celsius": [
+        13.0,
+        56.0
+      ]
+    },
+    {
+      "id": "LC09_L2SP_197031_20250815_20250816_02_T1",
+      "date": "2025-08-15",
+      "xgboost": "2025-08-15_xgboost.png",
+      "cnn": "2025-08-15_cnn.png",
+      "range_celsius": [
+        13.0,
+        56.0
+      ]
+    },
+    {
+      "id": "LC09_L2SP_197031_20260428_20260429_02_T1",
+      "date": "2026-04-28",
+      "xgboost": "2026-04-28_xgboost.png",
+      "cnn": "2026-04-28_cnn.png",
+      "range_celsius": [
+        13.0,
+        56.0
+      ]
+    },
+    {
+      "id": "LC09_L2SP_198031_20260403_20260404_02_T1",
+      "date": "2026-04-03",
+      "xgboost": "2026-04-03_xgboost.png",
+      "cnn": "2026-04-03_cnn.png",
+      "range_celsius": [
+        13.0,
+        56.0
+      ]
+    },
+    {
+      "id": "LC09_L2SP_198031_20260622_20260623_02_T1",
+      "date": "2026-06-22",
+      "xgboost": "2026-06-22_xgboost.png",
+      "cnn": "2026-06-22_cnn.png",
+      "range_celsius": [
+        13.0,
+        56.0
+      ]
+    }
+  ],
+  "common_range_celsius": [
+    13.0,
+    56.0
+  ],
+  "error_difference": {
+    "image": "error_difference_cnn_vs_xgboost.png",
+    "range_celsius": [
+      -2.577,
+      2.577
+    ],
+    "description": "|error CNN| − |error XGBoost|"
+  }
+}
