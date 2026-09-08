@@ -18,5 +18,8 @@ venv/
 Thumbs.db
 
 # Assets gráficos
-cd assets/graphic/
+assets/graphic/
 assets/UrbanHeat_BCN_Inventario_assets.xlsx
+
+# Presentacion
+presentation_order.md

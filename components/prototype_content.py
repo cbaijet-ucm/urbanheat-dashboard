@@ -37,7 +37,7 @@ def render_object_canvas_editor(storage_suffix: str = "scope") -> None:
           .toolbar button,.toolbar select,.toolbar input{height:26px;border:1px solid #aaa;background:#fff;color:#111;font:12px Arial,sans-serif}
           .toolbar button{min-width:27px;padding:0 7px;cursor:pointer}
           .toolbar button:hover{border-color:#0000ff;color:#0000ff}
-          .toolbar select{min-width:145px;padding:0 4px}.toolbar #font-size{width:70px;min-width:70px}.toolbar #font-size-custom{width:58px;padding:0 4px}.toolbar #line-height{width:72px;min-width:72px}.toolbar input[type=color]{width:30px;padding:1px}.toolbar #image-opacity{width:105px}.toolbar #image-opacity-value{width:52px;padding:0 4px}.toolbar #arrow-width{width:54px;padding:0 4px}
+          .toolbar select{min-width:145px;padding:0 4px}.toolbar #font-size{width:70px;min-width:70px}.toolbar #font-size-custom{width:58px;padding:0 4px}.toolbar #line-height{width:72px;min-width:72px}.toolbar input[type=color]{width:30px;padding:1px}.toolbar #image-opacity{width:105px}.toolbar #image-opacity-value{width:52px;padding:0 4px}
           .canvas{position:relative;width:100%;height:1400px;overflow:hidden;background:#fff}
           .canvas-object{position:absolute;min-width:80px;min-height:42px;border:1px solid transparent;background:transparent}
           .canvas-object.selected{outline:2px solid #0000ff;outline-offset:1px}
@@ -66,7 +66,7 @@ def render_object_canvas_editor(storage_suffix: str = "scope") -> None:
         </style>
         <div class="object-editor">
           <div class="toolbar">
-            <span class="group"><button id="add-text">Insertar cuadro de texto</button><button id="add-image">Insertar imagen</button><button id="add-arrow">Insertar flecha</button><button id="add-web">Insertar web</button><input id="image-file" type="file" accept="image/*" hidden></span>
+            <span class="group"><button id="add-text">Insertar cuadro de texto</button><button id="add-image">Insertar imagen</button><button id="add-web">Insertar web</button><input id="image-file" type="file" accept="image/*" hidden></span>
             <span class="group"><select id="font">
               <option>Arial</option><option>Helvetica</option><option>Inter</option><option>Roboto</option><option>Aptos</option><option>Calibri</option><option>Segoe UI</option><option>Verdana</option><option>Tahoma</option><option>Trebuchet MS</option><option>Century Gothic</option><option>Georgia</option><option>Garamond</option><option>Palatino Linotype</option><option>Book Antiqua</option><option>Times New Roman</option><option>Courier New</option><option>Consolas</option><option>Impact</option>
             </select><button id="font-smaller" aria-label="Reducir tamaño">−</button><select id="font-size" aria-label="Tamaños predefinidos"><option value="" disabled>—</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>14</option><option>16</option><option selected>18</option><option>20</option><option>24</option><option>28</option><option>32</option><option>36</option><option>40</option><option>48</option><option>56</option><option>64</option><option>72</option><option>96</option><option>120</option><option>144</option></select><input id="font-size-custom" type="number" min="8" max="144" step="1" value="18" aria-label="Tamaño de fuente personalizado"><button id="font-larger" aria-label="Aumentar tamaño">+</button><select id="line-height" aria-label="Interlineado"><option value="0.8">0.80</option><option value="0.9">0.90</option><option value="1">1.00</option><option value="1.05">1.05</option><option value="1.1">1.10</option><option value="1.15">1.15</option><option value="1.2">1.20</option><option value="1.25">1.25</option><option value="1.3">1.30</option><option value="1.35">1.35</option><option value="1.4">1.40</option><option value="1.45" selected>1.45</option><option value="1.5">1.50</option><option value="1.6">1.60</option><option value="1.7">1.70</option><option value="1.8">1.80</option><option value="2">2.00</option><option value="2.25">2.25</option><option value="2.5">2.50</option><option value="3">3.00</option></select><input id="text-color" type="color" value="#161616" aria-label="Color del texto"><button id="pick-text-color" aria-label="Capturar color para el texto" title="Cuentagotas: aplicar al texto">◎T</button><input id="fill-color" type="color" value="#ffffff" aria-label="Color de fondo"><button id="pick-fill-color" aria-label="Capturar color para el fondo" title="Cuentagotas: aplicar al fondo">◎F</button></span>
@@ -75,7 +75,6 @@ def render_object_canvas_editor(storage_suffix: str = "scope") -> None:
             <span class="group"><button data-command="insertUnorderedList">• Lista</button><button data-command="insertOrderedList">1. Lista</button><button data-command="outdent" aria-label="Reducir sangría">⇤</button><button data-command="indent" aria-label="Aumentar sangría">⇥</button><button data-command="removeFormat">Limpiar formato</button></span>
             <span class="group"><strong>Tabla</strong><button id="table-row-add">+ Fila</button><button id="table-row-delete">− Fila</button><button id="table-column-add">+ Col.</button><button id="table-column-delete">− Col.</button><button id="table-cell-fill">Color celda</button><button id="table-borders">Bordes</button><button id="table-valign-top">V arriba</button><button id="table-valign-middle">V centro</button><button id="table-valign-bottom">V abajo</button></span>
             <span class="group"><label for="image-opacity">Alpha</label><input id="image-opacity" type="range" min="0" max="100" step="1" value="100" disabled><input id="image-opacity-value" type="number" min="0" max="100" step="1" value="100" disabled><span>%</span></span>
-            <span class="group"><label for="arrow-width">Flecha</label><input id="arrow-width" type="number" min="1" max="30" step="1" value="4" aria-label="Grosor de flecha" disabled><input id="arrow-color" type="color" value="#161616" aria-label="Color de flecha" disabled></span>
             <span class="group"><button id="fit-image">Ajustar a imagen</button><button id="remove-background">Quitar fondo</button></span>
             <span class="group"><button id="bring-front">Traer al frente</button><button id="send-back">Enviar al fondo</button></span>
             <span class="group"><button id="duplicate">Duplicar</button><button id="delete">Eliminar</button></span>
@@ -152,14 +151,10 @@ def render_object_canvas_editor(storage_suffix: str = "scope") -> None:
             const opacity=document.getElementById('image-opacity');
             const opacityValue=document.getElementById('image-opacity-value');
             const isImage=Boolean(item&&item.type==='image');
-            const isArrow=Boolean(item&&item.type==='arrow');
             opacity.disabled=!isImage;opacityValue.disabled=!isImage;
-            document.getElementById('arrow-width').disabled=!isArrow;
-            document.getElementById('arrow-color').disabled=!isArrow;
             document.getElementById('fit-image').disabled=!isImage;
             document.getElementById('remove-background').disabled=!item||!['text','image'].includes(item.type);
             if(isImage){const alpha=item.opacity??100;opacity.value=String(alpha);opacityValue.value=String(alpha)}
-            if(isArrow){document.getElementById('arrow-width').value=String(item.strokeWidth??4);document.getElementById('arrow-color').value=item.stroke||'#161616'}
             if(!item||item.type!=='text')return;
             document.getElementById('font').value=item.style.fontFamily||'Arial';
             const size=item.style.fontSize||18;
@@ -287,20 +282,15 @@ def render_object_canvas_editor(storage_suffix: str = "scope") -> None:
           };
           const selectOnly=id=>{selectedIds.clear();selectedIds.add(id);selectedId=id};
           const addText=()=>{const item={id:uid(),type:'text',x:40,y:40,w:420,h:120,html:'Nuevo texto',style:baseStyle()};objects.push(item);selectOnly(item.id);render()};
-          const addArrow=()=>{const item={id:uid(),type:'arrow',x:50,y:80,w:320,h:72,stroke:'#161616',strokeWidth:4};objects.push(item);selectOnly(item.id);render()};
           const imageDimensions=(naturalWidth,naturalHeight,maxWidth=null)=>{const aspect=Math.max(.01,naturalWidth/naturalHeight);let width=Math.min(maxWidth||760,Math.max(240,canvas.clientWidth-100));let height=width/aspect;const maxHeight=700;if(height>maxHeight){height=maxHeight;width=height*aspect}return {w:Math.max(80,Math.round(width)),h:Math.max(42,Math.round(height))}};
           document.getElementById('add-text').onclick=addText;
           document.getElementById('add-image').onclick=()=>document.getElementById('image-file').click();
-          document.getElementById('add-arrow').onclick=addArrow;
           document.getElementById('add-web').onclick=()=>{let url=window.prompt('URL de la web que quieres incrustar:','https://');if(!url)return;url=url.trim();if(!/^https?:/i.test(url))url='https://'+url;try{const parsed=new URL(url);if(!['http:','https:'].includes(parsed.protocol))throw new Error('protocol');url=parsed.href}catch(_){window.alert('Introduce una URL http/https válida.');return}const item={id:uid(),type:'web',x:50,y:80,w:720,h:480,src:url,title:url};objects.push(item);selectOnly(item.id);render()};
           document.getElementById('image-file').onchange=event=>{const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{const probe=new Image();probe.onload=()=>{const size=imageDimensions(probe.naturalWidth,probe.naturalHeight);const item={id:uid(),type:'image',x:50,y:80,w:size.w,h:size.h,src:reader.result,opacity:100};objects.push(item);selectOnly(item.id);render();save(true)};probe.src=reader.result};reader.readAsDataURL(file);event.target.value=''};
           document.getElementById('fit-image').onclick=()=>{const item=selected();if(!item||item.type!=='image')return;const probe=new Image();probe.onload=()=>{const size=imageDimensions(probe.naturalWidth,probe.naturalHeight,item.w);item.w=size.w;item.h=size.h;render()};probe.src=item.src};
           const applyImageOpacity=value=>{const item=selected();if(!item||item.type!=='image')return;const alpha=clamp(parseInt(value,10)||0,0,100);item.opacity=alpha;document.getElementById('image-opacity').value=String(alpha);document.getElementById('image-opacity-value').value=String(alpha);const image=document.querySelector(`.canvas-object[data-id="${item.id}"] .image-content`);if(image)image.style.opacity=String(alpha/100);save()};
           document.getElementById('image-opacity').oninput=event=>applyImageOpacity(event.target.value);
           document.getElementById('image-opacity-value').oninput=event=>applyImageOpacity(event.target.value);
-          const applyArrowStyle=()=>{const item=selected();if(!item||item.type!=='arrow')return;item.strokeWidth=clamp(parseInt(document.getElementById('arrow-width').value,10)||1,1,30);item.stroke=document.getElementById('arrow-color').value;const node=document.querySelector(`.canvas-object[data-id="${item.id}"]`);const line=node?.querySelector('[data-arrow-part="line"]');const head=node?.querySelector('[data-arrow-part="head"]');if(line){line.setAttribute('stroke',item.stroke);line.setAttribute('stroke-width',String(item.strokeWidth))}if(head)head.setAttribute('fill',item.stroke);save()};
-          document.getElementById('arrow-width').oninput=applyArrowStyle;
-          document.getElementById('arrow-color').oninput=applyArrowStyle;
           const removeBackground=()=>{const item=selected();if(!item||item.type==='web')return;if(item.type==='text'){applyTextStyle({background:'transparent'});return}const source=new Image();source.onload=()=>{const work=document.createElement('canvas');work.width=source.naturalWidth;work.height=source.naturalHeight;const context=work.getContext('2d',{willReadFrequently:true});context.drawImage(source,0,0);const pixels=context.getImageData(0,0,work.width,work.height);const data=pixels.data;const corners=[0,(work.width-1)*4,(work.width*(work.height-1))*4,(work.width*work.height-1)*4];const background=corners.reduce((rgb,index)=>[rgb[0]+data[index],rgb[1]+data[index+1],rgb[2]+data[index+2]],[0,0,0]).map(value=>value/corners.length);for(let index=0;index<data.length;index+=4){const distance=Math.hypot(data[index]-background[0],data[index+1]-background[1],data[index+2]-background[2]);if(distance<=22)data[index+3]=0;else if(distance<58)data[index+3]=Math.round(data[index+3]*(distance-22)/36)}context.putImageData(pixels,0,0);item.src=work.toDataURL('image/png');render()};source.src=item.src};
           document.getElementById('remove-background').onclick=removeBackground;
           const applyTextStyle=(patch)=>{const item=selected();if(!item||item.type!=='text')return;Object.assign(item.style,patch);const content=document.querySelector(`.canvas-object[data-id="${item.id}"] .text-content`);if(!content)return;Object.assign(content.style,patch);if(patch.fontSize!==undefined)content.style.fontSize=patch.fontSize+'px';save()};
@@ -866,15 +856,6 @@ def render_modelizacion_metodologia_slide_deck() -> None:
             render_object_canvas_editor("modelizacion_metodologia_split")
 
 
-def render_modelizacion_resultados_metricas_slide_deck() -> None:
-    """Dos lienzos HTML para las métricas de resultados."""
-    with st.container(key="modelizacion_resultados_metricas_slide_deck"):
-        with st.container(key="modelizacion_resultados_metricas_slide_1"):
-            render_object_canvas_editor("modelizacion_resultados_metricas_1")
-        with st.container(key="modelizacion_resultados_metricas_slide_2"):
-            render_object_canvas_editor("modelizacion_resultados_metricas_2")
-
-
 @st.cache_data(show_spinner=False)
 def _model_comparison_payload(manifest_mtime_ns: int) -> dict[str, object]:
     """Carga las capas precalculadas: la UI no ejecuta ninguna inferencia."""
@@ -1224,29 +1205,13 @@ def render_modelizacion_visualizacion_slide_deck() -> None:
             render_model_error_difference_map()
 
 
-def render_sociodemografico_vulnerabilidad_slide_deck() -> None:
-    if st.session_state.get("presentation_mode", False):
-        with st.container(key="sociodemografico_vulnerabilidad_slide_deck"):
-            with st.container(key="sociodemografico_vulnerabilidad_slide_1"):
-                render_object_canvas_editor("sociodemografico_vulnerabilidad_html")
-            with st.container(key="sociodemografico_vulnerabilidad_slide_2"):
-                render_thermal_social_priority_map()
-        return
-    """Vulnerabilidad: HTML y mapa, renderizados de forma exclusiva."""
-    slide_index = int(st.session_state.get("sociodemografico_vulnerabilidad_slide_index", 0)) % 2
-    if slide_index == 0:
+def render_sociodemografico_vulnerabilidad_hybrid() -> None:
+    """Una pantalla híbrida: lienzo HTML a la izquierda y mapa a la derecha."""
+    html_column, map_column = st.columns([2, 3], gap="small", vertical_alignment="top")
+    with html_column:
         render_object_canvas_editor("sociodemografico_vulnerabilidad_html")
-    else:
+    with map_column:
         render_thermal_social_priority_map()
-
-
-def render_conclusiones_slide_deck() -> None:
-    """Dos lienzos HTML para la síntesis final."""
-    with st.container(key="conclusiones_slide_deck"):
-        with st.container(key="conclusiones_slide_1"):
-            render_object_canvas_editor("conclusiones_1")
-        with st.container(key="conclusiones_slide_2"):
-            render_object_canvas_editor("conclusiones_2")
 
 
 def render_scope_motivation_slide_deck() -> None:

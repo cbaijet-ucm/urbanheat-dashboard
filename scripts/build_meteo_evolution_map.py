@@ -94,8 +94,12 @@ def main() -> None:
             normalized = np.clip((raster - low) / (high - low), 0, 1)
             rgba = (cmap(np.nan_to_num(normalized, nan=0.0)) * 255).astype(np.uint8)
             rgba[..., 3] = np.where(np.isfinite(raster), 255, 0).astype(np.uint8)
-            filename = f"{feature}.webp"
-            Image.fromarray(rgba, mode="RGBA").save(scene_dir / filename, "WEBP", quality=82, method=4)
+            # Streamlit's static-file server only guarantees browser image MIME
+            # types for PNG/JPEG/GIF.  WEBP is returned as text/plain with
+            # ``X-Content-Type-Options: nosniff`` on Community Cloud, so Leaflet
+            # cannot use it as an image overlay there.
+            filename = f"{feature}.png"
+            Image.fromarray(rgba, mode="RGBA").save(scene_dir / filename, "PNG", optimize=True)
             images[feature] = f"meteo/{scene_key}/{filename}"
         scenes.append({"id": scene_id, "label": scene_date(scene_id), "images": images})
         print(f"[{scene_index + 1}/{len(scene_frames)}] {scene_id}")

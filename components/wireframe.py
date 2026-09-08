@@ -16,11 +16,9 @@ from components.prototype_content import (
     render_land_cover_slide_deck,
     render_distancias_slide_deck,
     render_modelizacion_metodologia_slide_deck,
-    render_modelizacion_resultados_metricas_slide_deck,
     render_modelizacion_visualizacion_slide_deck,
     render_territorial_lst_map,
-    render_sociodemografico_vulnerabilidad_slide_deck,
-    render_conclusiones_slide_deck,
+    render_sociodemografico_vulnerabilidad_hybrid,
 )
 
 
@@ -46,15 +44,16 @@ SECTION_STRUCTURE = {
         "Modelo tabular": "HTML",
         "Red CNN / Entrenamiento": "HTML",
         "Red CNN / Arquitectura final": "HTML",
-        "Resultados / Métricas": "HTML · 2 slides",
+        "Resultados / Métricas": "HTML",
         "Resultados / Visualización": "Mapa interactivo · HTML · Mapa interactivo · 3 slides",
     },
     "Análisis sociodemográfico": {
         "Agregación": "Mapa interactivo",
-        "Vulnerabilidad": "HTML · Mapa interactivo · 2 slides",
+        "Vulnerabilidad": "HTML + mapa interactivo · pantalla híbrida 40/60",
     },
-    "Conclusiones": {
-        "Conclusiones": "HTML · 2 slides",
+    "Síntesis": {
+        "Conclusiones": "HTML",
+        "Ir más allá": "HTML",
     },
 }
 
@@ -181,7 +180,7 @@ def render_parent_page(
             if section == "Modelización" and subsection == "Resultados / Métricas":
                 with st.container(key="movable_modelizacion_resultados_metricas"):
                     _subsection_header(subsection, state, is_active)
-                    render_modelizacion_resultados_metricas_slide_deck()
+                    render_object_canvas_editor("modelizacion_resultados_metricas_1")
                 continue
             if section == "Modelización" and subsection == "Resultados / Visualización":
                 with st.container(key="movable_modelizacion_visualizacion"):
@@ -210,12 +209,13 @@ def render_parent_page(
             if section == "Análisis sociodemográfico" and subsection == "Vulnerabilidad":
                 with st.container(key="movable_sociodemografico_vulnerabilidad"):
                     _subsection_header(subsection, state, is_active)
-                    render_sociodemografico_vulnerabilidad_slide_deck()
+                    render_sociodemografico_vulnerabilidad_hybrid()
                 continue
-            if section == "Conclusiones" and subsection == "Conclusiones":
-                with st.container(key="movable_conclusiones"):
+            if section == "Síntesis" and subsection in {"Conclusiones", "Ir más allá"}:
+                storage_suffix = "conclusiones_1" if subsection == "Conclusiones" else "conclusiones_2"
+                with st.container(key=f"movable_{storage_suffix}"):
                     _subsection_header(subsection, state, is_active)
-                    render_conclusiones_slide_deck()
+                    render_object_canvas_editor(storage_suffix)
                 continue
             with st.container(key=f"movable_{anchor_id(section, subsection).replace('-', '_')}"):
                 _subsection_header(subsection, state, is_active)

@@ -36,35 +36,30 @@ Edita únicamente el número al final de cada pantalla.
     - Slide 1 · HTML — 10
     - Slide 2 · Mapa interactivo de evolución meteorológica — 0
     - Slide 3 · HTML — 11
-- Matriz celda-escena — 12
+- Matriz celda-escena — 0
 
 ## Modelización
 
 - Metodología
-  - Slide 1 · Formulación — 0
-  - Slide 2 · Split — 0
-- Modelo tabular — 0
+  - Slide 1 · Formulación — 12
+  - Slide 2 · Split — 13
+- Modelo tabular — 14
 - Red CNN
-  - Entrenamiento — 0
-  - Arquitectura final — 0
+  - Entrenamiento — 15
+  - Arquitectura final — 16
 - Resultados
-  - Métricas
-    - Slide 1 — 0
-    - Slide 2 — 0
+  - Métricas · HTML — 17
   - Visualización
-    - Slide 1 · Predicción XGBoost vs Red CNN — 0
-    - Slide 2 · HTML — 0
+    - Slide 1 · Predicción XGBoost vs Red CNN — 18
+    - Slide 2 · HTML — 19
     - Slide 3 · Diferencia de error CNN vs XGBoost — 0
 
 ## Análisis sociodemográfico
 
 - Agregación · Mapa interactivo — 0
-- Vulnerabilidad
-  - Slide 1 · HTML — 0
-  - Slide 2 · Mapa interactivo — 0
+- Vulnerabilidad · HTML + mapa interactivo — 20
 
-## Conclusiones
+## Síntesis
 
-- Conclusiones
-  - Slide 1 — 0
-  - Slide 2 — 0
+- Conclusiones · HTML — 21
+- Ir más allá · HTML — 22

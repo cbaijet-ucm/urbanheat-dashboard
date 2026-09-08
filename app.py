@@ -132,7 +132,8 @@ legacy_sections = {
     "MODELIZACIÓN": "Modelización",
     "ESTUDIO SOCIODEMOGRÁFICO": "Análisis sociodemográfico",
     "Estudio sociodemográfico": "Análisis sociodemográfico",
-    "CONCLUSIONES": "Conclusiones",
+    "CONCLUSIONES": "Síntesis",
+    "Conclusiones": "Síntesis",
 }
 st.session_state.active_section = legacy_sections.get(
     st.session_state.get("active_section"), st.session_state.get("active_section")
@@ -169,12 +170,12 @@ if (
     st.session_state.loaded_subsections.add(("Dataset", "Predictores / Land cover"))
 
 if (
-    st.session_state.get("active_section") == "Conclusiones"
+    st.session_state.get("active_section") == "Síntesis"
     and st.session_state.get("active_subsection") == "Síntesis"
 ):
     st.session_state.active_subsection = "Conclusiones"
-    st.session_state.loaded_subsections.add(("Conclusiones", "Conclusiones"))
-    st.session_state.scroll_target = anchor_id("Conclusiones", "Conclusiones")
+    st.session_state.loaded_subsections.add(("Síntesis", "Conclusiones"))
+    st.session_state.scroll_target = anchor_id("Síntesis", "Conclusiones")
 
 if st.session_state.active_section not in SECTION_STRUCTURE:
     st.session_state.active_section = "Dataset"
@@ -204,8 +205,6 @@ def go_to(section: str, subsection: str) -> None:
         st.session_state.distancias_slide_index = 0
     if section == "Dataset" and subsection == "Predictores / Meteo":
         st.session_state.meteo_slide_index = 0
-    if section == "Análisis sociodemográfico" and subsection == "Vulnerabilidad":
-        st.session_state.sociodemografico_vulnerabilidad_slide_index = 0
 
 
 def _navigation_button(
@@ -261,16 +260,14 @@ PRESENTATION_TARGETS = {
     "modelizacion / modelo tabular": ("Modelización", "Modelo tabular", None),
     "modelizacion / red cnn / entrenamiento": ("Modelización", "Red CNN / Entrenamiento", None),
     "modelizacion / red cnn / arquitectura final": ("Modelización", "Red CNN / Arquitectura final", None),
-    "modelizacion / resultados / metricas / slide 1": ("Modelización", "Resultados / Métricas", 0),
-    "modelizacion / resultados / metricas / slide 2": ("Modelización", "Resultados / Métricas", 1),
+    "modelizacion / resultados / metricas · html": ("Modelización", "Resultados / Métricas", None),
     "modelizacion / resultados / visualizacion / slide 1 · prediccion xgboost vs red cnn": ("Modelización", "Resultados / Visualización", 0),
     "modelizacion / resultados / visualizacion / slide 2 · html": ("Modelización", "Resultados / Visualización", 1),
     "modelizacion / resultados / visualizacion / slide 3 · diferencia de error cnn vs xgboost": ("Modelización", "Resultados / Visualización", 2),
     "analisis sociodemografico / agregacion · mapa interactivo": ("Análisis sociodemográfico", "Agregación", None),
-    "analisis sociodemografico / vulnerabilidad / slide 1 · html": ("Análisis sociodemográfico", "Vulnerabilidad", 0),
-    "analisis sociodemografico / vulnerabilidad / slide 2 · mapa interactivo": ("Análisis sociodemográfico", "Vulnerabilidad", 1),
-    "conclusiones / conclusiones / slide 1": ("Conclusiones", "Conclusiones", 0),
-    "conclusiones / conclusiones / slide 2": ("Conclusiones", "Conclusiones", 1),
+    "analisis sociodemografico / vulnerabilidad · html + mapa interactivo": ("Análisis sociodemográfico", "Vulnerabilidad", None),
+    "sintesis / conclusiones": ("Síntesis", "Conclusiones", None),
+    "sintesis / ir mas alla": ("Síntesis", "Ir más allá", None),
 }
 PRESENTATION_TARGETS = {
     _presentation_slug(path): target for path, target in PRESENTATION_TARGETS.items()
@@ -284,10 +281,7 @@ PRESENTATION_DECKS = {
     ("Dataset", "Predictores / Distancias"): ("distancias_slide", 2),
     ("Dataset", "Predictores / Meteo"): ("meteo_slide", 3),
     ("Modelización", "Metodología"): ("modelizacion_metodologia_slide", 2),
-    ("Modelización", "Resultados / Métricas"): ("modelizacion_resultados_metricas_slide", 2),
     ("Modelización", "Resultados / Visualización"): ("modelizacion_visualizacion_slide", 3),
-    ("Análisis sociodemográfico", "Vulnerabilidad"): ("sociodemografico_vulnerabilidad_slide", 2),
-    ("Conclusiones", "Conclusiones"): ("conclusiones_slide", 2),
 }
 
 
@@ -334,8 +328,6 @@ def _apply_presentation_target(target: tuple[int, str, str, int | None]) -> None
         st.session_state.distancias_slide_index = slide_index or 0
     elif section == "Dataset" and subsection == "Predictores / Meteo":
         st.session_state.meteo_slide_index = slide_index or 0
-    elif section == "Análisis sociodemográfico" and subsection == "Vulnerabilidad":
-        st.session_state.sociodemografico_vulnerabilidad_slide_index = slide_index or 0
 
 
 def enter_presentation_mode() -> None:
@@ -510,8 +502,6 @@ if st.session_state.get("_last_rendered_route") != current_route:
         st.session_state.distancias_slide_index = 0
     if current_route == ("Dataset", "Predictores / Meteo"):
         st.session_state.meteo_slide_index = 0
-    if current_route == ("Análisis sociodemográfico", "Vulnerabilidad"):
-        st.session_state.sociodemografico_vulnerabilidad_slide_index = 0
     st.session_state._last_rendered_route = current_route
 subsections = list(SECTION_STRUCTURE[current_section])
 subsection_index = subsections.index(current_subsection)
@@ -754,43 +744,9 @@ elif current_section == "Dataset" and current_subsection == "Predictores / Land 
     slide_navigation = ("st-key-land_cover_slide_deck", "st-key-land_cover_slide_", 2)
 elif current_section == "Modelización" and current_subsection == "Metodología":
     slide_navigation = ("st-key-modelizacion_metodologia_slide_deck", "st-key-modelizacion_metodologia_slide_", 2)
-elif current_section == "Modelización" and current_subsection == "Resultados / Métricas":
-    slide_navigation = ("st-key-modelizacion_resultados_metricas_slide_deck", "st-key-modelizacion_resultados_metricas_slide_", 2)
 elif current_section == "Modelización" and current_subsection == "Resultados / Visualización":
     slide_navigation = ("st-key-modelizacion_visualizacion_slide_deck", "st-key-modelizacion_visualizacion_slide_", 3)
-elif current_section == "Conclusiones" and current_subsection == "Conclusiones":
-    slide_navigation = ("st-key-conclusiones_slide_deck", "st-key-conclusiones_slide_", 2)
-if not st.session_state.presentation_mode and current_section == "Análisis sociodemográfico" and current_subsection == "Vulnerabilidad":
-    with st.container(key="slide_navigation"):
-        render_slide_navigation("st-key-sociodemografico_vulnerabilidad_slide_deck", "st-key-sociodemografico_vulnerabilidad_slide_", 2)
-    with st.container(key="sociodemografico_vulnerabilidad_slide_trigger"):
-        current_slide = int(st.session_state.get("sociodemografico_vulnerabilidad_slide_index", 0)) % 2
-        if st.button("Siguiente slide", key="sociodemografico_vulnerabilidad_slide_trigger_button"):
-            st.session_state.sociodemografico_vulnerabilidad_slide_index = (current_slide + 1) % 2
-            st.rerun()
-    components.html(
-        """
-        <script>
-          const root=window.parent.document;
-          const bind=()=>root.querySelectorAll('.st-key-slide_navigation iframe').forEach((frame)=>{
-            if(frame.dataset.vulnerabilitySlideBound==='true')return;
-            frame.dataset.vulnerabilitySlideBound='true';
-            const attach=()=>{try{
-              const next=frame.contentDocument.getElementById('next-slide');
-              if(next && next.dataset.vulnerabilitySlideBound!=='true'){
-                next.dataset.vulnerabilitySlideBound='true';
-                next.addEventListener('click',()=>root.querySelector('.st-key-sociodemografico_vulnerabilidad_slide_trigger_button button')?.click());
-              }
-            }catch(_){}};
-            frame.addEventListener('load',attach);attach();
-          });
-          bind();new MutationObserver(bind).observe(root.body,{childList:true,subtree:true});
-        </script>
-        """,
-        height=0,
-        width=0,
-    )
-elif current_section == "Dataset" and current_subsection == "Predictores / Meteo":
+if current_section == "Dataset" and current_subsection == "Predictores / Meteo":
     with st.container(key="slide_navigation"):
         render_slide_navigation("st-key-meteo_slide_deck", "st-key-meteo_slide_", 3)
     with st.container(key="meteo_slide_trigger"):

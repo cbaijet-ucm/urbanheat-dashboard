@@ -43,7 +43,7 @@ def test_arrow_navigation_visits_every_route_once() -> None:
             )
 
 
-def test_vulnerability_second_slide_renders_without_error() -> None:
+def test_vulnerability_hybrid_renders_without_slide_navigation() -> None:
     app = AppTest.from_file(str(DASHBOARD_DIR / "app.py"))
     app.run(timeout=60)
     for button_key in (
@@ -58,7 +58,8 @@ def test_vulnerability_second_slide_renders_without_error() -> None:
 
     assert app.session_state["active_section"] == "Análisis sociodemográfico"
     assert app.session_state["active_subsection"] == "Vulnerabilidad"
-    app.button(key="sociodemografico_vulnerabilidad_slide_trigger_button").click()
-    app.run(timeout=60)
     assert not app.exception
-    assert app.session_state["sociodemografico_vulnerabilidad_slide_index"] == 1
+    assert not any(
+        button.key == "sociodemografico_vulnerabilidad_slide_trigger_button"
+        for button in app.button
+    )

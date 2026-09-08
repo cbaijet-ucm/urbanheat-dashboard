@@ -102,12 +102,8 @@ def apply_global_styles() -> None:
     .st-key-land_cover_slide_2 {display: none;}
     .st-key-modelizacion_metodologia_slide_deck {position: relative !important; overflow: visible !important;}
     .st-key-modelizacion_metodologia_slide_2, .st-key-modelizacion_metodologia_slide_3 {display: none;}
-    .st-key-modelizacion_resultados_metricas_slide_deck {position: relative !important; overflow: visible !important;}
-    .st-key-modelizacion_resultados_metricas_slide_2 {display: none;}
     .st-key-modelizacion_visualizacion_slide_deck {position: relative !important; overflow: visible !important;}
     .st-key-modelizacion_visualizacion_slide_2, .st-key-modelizacion_visualizacion_slide_3 {display: none;}
-    .st-key-conclusiones_slide_deck {position: relative !important; overflow: visible !important;}
-    .st-key-conclusiones_slide_2 {display: none;}
     .st-key-slide_navigation {
       position: fixed !important; top: 5.4rem; right: 1.35rem !important;
       z-index: 2700 !important; width: 58px !important; height: 58px !important; margin: 0 !important; padding: 0 !important;
@@ -116,9 +112,7 @@ def apply_global_styles() -> None:
     .st-key-distancias_slide_trigger,
     .element-container:has(.st-key-distancias_slide_trigger),
     .st-key-meteo_slide_trigger,
-    .element-container:has(.st-key-meteo_slide_trigger),
-    .st-key-sociodemografico_vulnerabilidad_slide_trigger,
-    .element-container:has(.st-key-sociodemografico_vulnerabilidad_slide_trigger) {display: none !important;}
+    .element-container:has(.st-key-meteo_slide_trigger) {display: none !important;}
     [data-urbanheat-movable-host] {will-change: transform;}
     .urbanheat-content-move-handle {
       position: absolute !important; top: 4px !important; left: 4px !important; z-index: 2600 !important;
