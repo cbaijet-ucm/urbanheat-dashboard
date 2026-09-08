@@ -84,12 +84,24 @@ mobile_notice_html = """
         overlay.id = overlayId;
         overlay.setAttribute('role', 'alert');
         overlay.setAttribute('aria-live', 'assertive');
+        const pageUrl = window.parent.location.href;
+        const shareText = `UrbanHeat BCN — ${pageUrl}`;
+        const emailUrl = `mailto:?subject=${encodeURIComponent('UrbanHeat BCN')}&body=${encodeURIComponent(shareText)}`;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
         overlay.innerHTML = `
           <section>
             <img class="urbanheat-mobile-logo" src="__MOBILE_LOGO_SOURCE__" alt="UrbanHeat BCN">
             <h2>Experiencia de escritorio</h2>
             <p>Este dashboard está optimizado para pantallas de ordenador.</p>
             <p>Ábrelo desde un equipo desktop para consultar mapas, visualizaciones y contenido con la escala adecuada.</p>
+            <nav class="urbanheat-mobile-share" aria-label="Compartir dashboard">
+              <a href="${emailUrl}" aria-label="Compartir por correo electrónico" title="Compartir por correo electrónico">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 5.5h17v13h-17zM4 6l8 6 8-6"/></svg>
+              </a>
+              <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" aria-label="Compartir por WhatsApp" title="Compartir por WhatsApp">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.6a8.35 8.35 0 0 1-12.33 7.32L3.5 20.5l1.54-4.46A8.35 8.35 0 1 1 20.5 11.6Z"/><path d="M8.4 7.7c.2-.45.4-.46.67-.45h.57c.18 0 .4.07.49.3l.7 1.65c.08.2.05.38-.07.56l-.32.43c-.11.12-.22.27-.09.5.14.26.62 1.02 1.33 1.65.91.82 1.68 1.08 1.92 1.2.23.12.37.1.5-.06l.65-.76c.15-.18.33-.2.55-.12l1.68.79c.22.1.36.15.42.26.06.11.06.65-.15 1.27-.2.6-1.18 1.14-1.63 1.2-.42.06-.94.29-3.2-.6-2.72-1.08-4.47-3.73-4.6-3.91-.13-.18-1.1-1.46-1.1-2.8 0-1.33.7-1.98.94-2.26Z"/></svg>
+              </a>
+            </nav>
           </section>`;
         const style = root.createElement('style');
         style.id = `${overlayId}-style`;
@@ -99,8 +111,12 @@ mobile_notice_html = """
           #${overlayId} section { width:min(100%, 28rem); border-top:1px solid #161616; padding-top:1rem; }
           #${overlayId} .urbanheat-mobile-logo { display:block; width:min(100%, 22rem); height:auto; margin:0 0 2.2rem; }
           #${overlayId} .urbanheat-mobile-eyebrow { margin:0 0 1.8rem; color:#0000ff; font-size:.76rem; letter-spacing:.1em; text-transform:uppercase; }
-          #${overlayId} h1 { margin:0 0 1rem; font-size:clamp(2rem, 10vw, 3.25rem); font-weight:300; letter-spacing:-.04em; line-height:.98; }
+          #${overlayId} h2 { margin:0 0 1rem; font-size:clamp(2rem, 10vw, 3.25rem); font-weight:300; letter-spacing:-.04em; line-height:.98; }
           #${overlayId} p { margin:.55rem 0; font-size:1rem; line-height:1.5; }
+          #${overlayId} .urbanheat-mobile-share { display:flex; gap:.65rem; margin-top:1.8rem; }
+          #${overlayId} .urbanheat-mobile-share a { display:grid; place-items:center; width:2.75rem; height:2.75rem; border:1px solid #161616; border-radius:50%; color:#161616; }
+          #${overlayId} .urbanheat-mobile-share a:active { background:#161616; color:#fff; }
+          #${overlayId} .urbanheat-mobile-share svg { width:1.2rem; height:1.2rem; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
         `;
         root.head.appendChild(style);
         root.body.appendChild(overlay);
