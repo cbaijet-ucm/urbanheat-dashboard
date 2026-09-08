@@ -87,8 +87,7 @@ mobile_notice_html = """
         overlay.innerHTML = `
           <section>
             <img class="urbanheat-mobile-logo" src="__MOBILE_LOGO_SOURCE__" alt="UrbanHeat BCN">
-            <p class="urbanheat-mobile-eyebrow">UrbanHeat BCN</p>
-            <h1>Experiencia de escritorio</h1>
+            <h2>Experiencia de escritorio</h2>
             <p>Este dashboard está optimizado para pantallas de ordenador.</p>
             <p>Ábrelo desde un equipo desktop para consultar mapas, visualizaciones y contenido con la escala adecuada.</p>
           </section>`;
