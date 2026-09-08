@@ -63,6 +63,18 @@ mobile_logo_source = (
     if mobile_logo_path.is_file()
     else ""
 )
+mobile_mail_path = APP_DIR / "assets" / "graphic" / "mail.png"
+mobile_mail_source = (
+    f"data:image/png;base64,{base64.b64encode(mobile_mail_path.read_bytes()).decode('ascii')}"
+    if mobile_mail_path.is_file()
+    else ""
+)
+mobile_whatsapp_path = APP_DIR / "assets" / "graphic" / "WhatsApp.svg.webp"
+mobile_whatsapp_source = (
+    f"data:image/webp;base64,{base64.b64encode(mobile_whatsapp_path.read_bytes()).decode('ascii')}"
+    if mobile_whatsapp_path.is_file()
+    else ""
+)
 mobile_notice_html = """
     <script>
       const root = window.parent.document;
@@ -85,7 +97,7 @@ mobile_notice_html = """
         overlay.setAttribute('role', 'alert');
         overlay.setAttribute('aria-live', 'assertive');
         const pageUrl = window.parent.location.href;
-        const shareText = `UrbanHeat BCN — ${pageUrl}`;
+        const shareText = `Consulta el dashbiard UrbanHeat BCN aquí — ${pageUrl}`;
         const emailUrl = `mailto:?subject=${encodeURIComponent('UrbanHeat BCN')}&body=${encodeURIComponent(shareText)}`;
         const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
         overlay.innerHTML = `
@@ -96,10 +108,10 @@ mobile_notice_html = """
             <p>Ábrelo desde un equipo desktop para consultar mapas, visualizaciones y contenido con la escala adecuada.</p>
             <nav class="urbanheat-mobile-share" aria-label="Compartir dashboard">
               <a href="${emailUrl}" aria-label="Compartir por correo electrónico" title="Compartir por correo electrónico">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 5.5h17v13h-17zM4 6l8 6 8-6"/></svg>
+                <img src="__MOBILE_MAIL_SOURCE__" alt="">
               </a>
               <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" aria-label="Compartir por WhatsApp" title="Compartir por WhatsApp">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.6a8.35 8.35 0 0 1-12.33 7.32L3.5 20.5l1.54-4.46A8.35 8.35 0 1 1 20.5 11.6Z"/><path d="M8.4 7.7c.2-.45.4-.46.67-.45h.57c.18 0 .4.07.49.3l.7 1.65c.08.2.05.38-.07.56l-.32.43c-.11.12-.22.27-.09.5.14.26.62 1.02 1.33 1.65.91.82 1.68 1.08 1.92 1.2.23.12.37.1.5-.06l.65-.76c.15-.18.33-.2.55-.12l1.68.79c.22.1.36.15.42.26.06.11.06.65-.15 1.27-.2.6-1.18 1.14-1.63 1.2-.42.06-.94.29-3.2-.6-2.72-1.08-4.47-3.73-4.6-3.91-.13-.18-1.1-1.46-1.1-2.8 0-1.33.7-1.98.94-2.26Z"/></svg>
+                <img src="__MOBILE_WHATSAPP_SOURCE__" alt="">
               </a>
             </nav>
           </section>`;
@@ -114,9 +126,9 @@ mobile_notice_html = """
           #${overlayId} h2 { margin:0 0 1rem; font-size:clamp(2rem, 10vw, 3.25rem); font-weight:300; letter-spacing:-.04em; line-height:.98; }
           #${overlayId} p { margin:.55rem 0; font-size:1rem; line-height:1.5; }
           #${overlayId} .urbanheat-mobile-share { display:flex; gap:.65rem; margin-top:1.8rem; }
-          #${overlayId} .urbanheat-mobile-share a { display:grid; place-items:center; width:2.75rem; height:2.75rem; border:1px solid #161616; border-radius:50%; color:#161616; }
-          #${overlayId} .urbanheat-mobile-share a:active { background:#161616; color:#fff; }
-          #${overlayId} .urbanheat-mobile-share svg { width:1.2rem; height:1.2rem; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+          #${overlayId} .urbanheat-mobile-share a { display:grid; place-items:center; width:3rem; height:3rem; border:1px solid #d8d8d8; border-radius:50%; background:#fff; }
+          #${overlayId} .urbanheat-mobile-share a:active { transform:scale(.94); }
+          #${overlayId} .urbanheat-mobile-share img { display:block; width:1.7rem; height:1.7rem; object-fit:contain; }
         `;
         root.head.appendChild(style);
         root.body.appendChild(overlay);
@@ -125,7 +137,10 @@ mobile_notice_html = """
     </script>
     """
 components.html(
-    mobile_notice_html.replace("__MOBILE_LOGO_SOURCE__", mobile_logo_source),
+    mobile_notice_html
+    .replace("__MOBILE_LOGO_SOURCE__", mobile_logo_source)
+    .replace("__MOBILE_MAIL_SOURCE__", mobile_mail_source)
+    .replace("__MOBILE_WHATSAPP_SOURCE__", mobile_whatsapp_source),
     height=0,
     width=0,
 )
