@@ -1,6 +1,7 @@
 """Estructura de navegación para la revisión visual del dashboard."""
 
 from pathlib import Path
+import base64
 import hashlib
 import hmac
 import sys
@@ -52,6 +53,66 @@ st.markdown(
     </style>
     """,
     unsafe_allow_html=True,
+)
+
+# El lienzo y sus mapas se han diseñado para interacción de escritorio. El
+# aviso vive en el documento padre para cubrir toda la interfaz de Streamlit.
+mobile_logo_path = APP_DIR / "assets" / "graphic" / "Logo.png"
+mobile_logo_source = (
+    f"data:image/png;base64,{base64.b64encode(mobile_logo_path.read_bytes()).decode('ascii')}"
+    if mobile_logo_path.is_file()
+    else ""
+)
+mobile_notice_html = """
+    <script>
+      const root = window.parent.document;
+      const isMobileVisitor = () => {
+        if (navigator.userAgentData?.mobile === true) return true;
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
+      };
+      const overlayId = 'urbanheat-desktop-only';
+      const applyDesktopOnlyNotice = () => {
+        const existing = root.getElementById(overlayId);
+        if (!isMobileVisitor()) {
+          existing?.remove();
+          delete root.documentElement.dataset.urbanheatDesktopOnly;
+          return;
+        }
+        root.documentElement.dataset.urbanheatDesktopOnly = 'true';
+        if (existing) return;
+        const overlay = root.createElement('main');
+        overlay.id = overlayId;
+        overlay.setAttribute('role', 'alert');
+        overlay.setAttribute('aria-live', 'assertive');
+        overlay.innerHTML = `
+          <section>
+            <img class="urbanheat-mobile-logo" src="__MOBILE_LOGO_SOURCE__" alt="UrbanHeat BCN">
+            <p class="urbanheat-mobile-eyebrow">UrbanHeat BCN</p>
+            <h1>Experiencia de escritorio</h1>
+            <p>Este dashboard está optimizado para pantallas de ordenador.</p>
+            <p>Ábrelo desde un equipo desktop para consultar mapas, visualizaciones y contenido con la escala adecuada.</p>
+          </section>`;
+        const style = root.createElement('style');
+        style.id = `${overlayId}-style`;
+        style.textContent = `
+          html[data-urbanheat-desktop-only="true"] [data-testid="stAppViewContainer"] { visibility:hidden !important; }
+          #${overlayId} { position:fixed; inset:0; z-index:2147483647; display:grid; place-items:center; box-sizing:border-box; padding:2rem; background:#fff; color:#161616; font-family:Helvetica,Arial,sans-serif; }
+          #${overlayId} section { width:min(100%, 28rem); border-top:1px solid #161616; padding-top:1rem; }
+          #${overlayId} .urbanheat-mobile-logo { display:block; width:min(100%, 22rem); height:auto; margin:0 0 2.2rem; }
+          #${overlayId} .urbanheat-mobile-eyebrow { margin:0 0 1.8rem; color:#0000ff; font-size:.76rem; letter-spacing:.1em; text-transform:uppercase; }
+          #${overlayId} h1 { margin:0 0 1rem; font-size:clamp(2rem, 10vw, 3.25rem); font-weight:300; letter-spacing:-.04em; line-height:.98; }
+          #${overlayId} p { margin:.55rem 0; font-size:1rem; line-height:1.5; }
+        `;
+        root.head.appendChild(style);
+        root.body.appendChild(overlay);
+      };
+      applyDesktopOnlyNotice();
+    </script>
+    """
+components.html(
+    mobile_notice_html.replace("__MOBILE_LOGO_SOURCE__", mobile_logo_source),
+    height=0,
+    width=0,
 )
 
 # El control nativo de Streamlit queda oculto con la cabecera minimalista. Esta
