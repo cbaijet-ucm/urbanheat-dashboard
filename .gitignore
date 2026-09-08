@@ -21,5 +21,12 @@ Thumbs.db
 assets/graphic/
 assets/UrbanHeat_BCN_Inventario_assets.xlsx
 
+# Variantes obsoletas conservadas únicamente en local
+assets/graphic/Old/
+static/meteo/**/*.webp
+
 # Presentacion
 presentation_order.md
+
+# Acceso privado al editor
+PRIVATE_EDITOR_ACCESS.md

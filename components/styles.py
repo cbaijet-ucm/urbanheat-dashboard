@@ -45,6 +45,9 @@ def apply_global_styles() -> None:
     .st-key-mode_toggle [data-testid="stToggle"] label p {font-size: .78rem !important; line-height: 1 !important; margin: 0 !important; color: #3f3f3f !important;}
     p, li, label, [data-testid="stMarkdownContainer"] {color: #161616 !important; font-size: 1rem; line-height: 1.55;}
     [data-testid="stSidebar"] img {width: 100% !important; max-width: 100% !important; height: auto !important; margin: 0 0 1.35rem !important;}
+    .st-key-secret_access_trigger {display: none !important;}
+    .st-key-sidebar_logo {cursor: default; user-select: none;}
+    .st-key-secret_access_panel {margin: -.55rem 0 1rem !important;}
     [data-testid="stSidebar"] [data-testid="stExpander"] {border: 0 !important; border-bottom: 1px solid #ededed !important; border-radius: 0 !important; background: #ffffff !important; margin: 0 !important;}
     [data-testid="stSidebar"] [data-testid="stExpander"] details {border: 0 !important; background: #ffffff !important;}
     [data-testid="stSidebar"] [data-testid="stExpander"] summary {padding: .65rem 0 !important; background: #ffffff !important; font-size: .9rem !important; font-weight: 500 !important;}

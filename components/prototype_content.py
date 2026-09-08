@@ -882,7 +882,7 @@ def _model_comparison_html(payload: dict[str, object]) -> str:
       #comparison-stage{{position:relative;width:100%;height:760px;background:#f4f4f4;border:1px solid #e7e7e7;box-sizing:border-box;overflow:hidden}}
       #comparison-map{{position:absolute;inset:0}}
       .leaflet-image-layer{{pointer-events:none}}
-      .comparison-select{{position:absolute;z-index:1200;left:12px;top:12px;background:rgba(255,255,255,.95);border:1px solid #d5d5d5;padding:8px 10px;display:flex;gap:8px;align-items:center;font-size:12px}}
+      .comparison-select{{position:absolute;z-index:1200;left:56px;top:12px;background:rgba(255,255,255,.95);border:1px solid #d5d5d5;padding:8px 10px;display:flex;gap:8px;align-items:center;font-size:12px}}
       .comparison-select select{{border:0;background:#fff;font:inherit;color:#161616;min-width:130px;outline:none}}
       .comparison-legend{{position:absolute;z-index:1200;right:12px;bottom:20px;background:rgba(255,255,255,.96);border:1px solid #bdbdbd;padding:10px 12px;font-size:12px;color:#252525}}
       .comparison-legend b{{font-weight:600}}
@@ -891,9 +891,10 @@ def _model_comparison_html(payload: dict[str, object]) -> str:
       .comparison-scale-ticks span{{position:absolute;top:7px;transform:translateX(-50%);white-space:nowrap}}
       .comparison-scale-ticks span::before{{content:'';position:absolute;left:50%;top:-7px;height:5px;border-left:1px solid #222}}
       .comparison-side-label{{position:absolute;z-index:1250;padding:9px 14px;background:rgba(255,235,77,.97);border:2px solid #111;color:#111;font-size:27px;font-weight:700;letter-spacing:-.03em;pointer-events:none;white-space:nowrap}}
-      #divider{{position:absolute;z-index:1100;top:0;bottom:0;left:50%;width:2px;background:#111;pointer-events:none;box-shadow:0 0 0 1px rgba(255,255,255,.9)}}
+      #divider{{position:absolute;z-index:1150;top:0;bottom:0;left:50%;width:18px;transform:translateX(-50%);background:transparent;pointer-events:auto;cursor:ew-resize;touch-action:none}}
+      #divider::before{{content:'';position:absolute;top:0;bottom:0;left:50%;width:2px;transform:translateX(-50%);background:#111;box-shadow:0 0 0 1px rgba(255,255,255,.9)}}
       #divider::after{{content:'↔';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid #111;color:#111;text-align:center;line-height:27px;font-size:17px;font-weight:600}}
-      #swipe{{position:absolute;z-index:1150;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;touch-action:none}}
+      #swipe{{position:absolute;z-index:1100;inset:0;width:100%;height:100%;margin:0;opacity:0;pointer-events:none}}
       .comparison-resize{{position:absolute;right:0;bottom:0;z-index:1300;width:20px;height:20px;cursor:nwse-resize;touch-action:none;background:linear-gradient(135deg,transparent 0 45%,#777 46% 52%,transparent 53% 64%,#777 65% 71%,transparent 72%)}}
       .leaflet-control-attribution{{font-size:8px!important}}
     </style>
@@ -911,7 +912,7 @@ def _model_comparison_html(payload: dict[str, object]) -> str:
       const stage=document.getElementById('comparison-stage');
       const storageKey='urbanheat-model-comparison-size-v1';
       try{{const saved=JSON.parse(localStorage.getItem(storageKey));if(saved){{stage.style.width=saved.width;stage.style.height=saved.height}}}}catch(_){{}}
-      const map=L.map('comparison-map',{{zoomControl:true,attributionControl:false}});
+      const map=L.map('comparison-map',{{zoomControl:true,attributionControl:false,scrollWheelZoom:true}});
       L.control.attribution({{prefix:false}}).addTo(map);
       L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{{z}}/{{y}}/{{x}}',{{maxZoom:17,attribution:'Tiles © Esri',opacity:.78}}).addTo(map);
       const bounds=payload.bounds, geographicBounds=L.latLngBounds(bounds);
@@ -930,7 +931,22 @@ def _model_comparison_html(payload: dict[str, object]) -> str:
       function renderScale(range){{const low=Number(range[0]),high=Number(range[1]);const interior=[];for(let tick=Math.ceil(low/10)*10;tick<high;tick+=10)interior.push(tick);const ticks=[low,...interior,high];scaleTicks.innerHTML=ticks.map(tick=>`<span style="left:${{((tick-low)/(high-low))*100}}%">${{tick}}°</span>`).join('')}}
       function setScene(){{const scene=payload.scenes[Number(select.value)];if(xgbLayer)map.removeLayer(xgbLayer);if(cnnLayer)map.removeLayer(cnnLayer);cnnLayer=L.imageOverlay(scene.cnn_src,bounds,{{opacity:1,interactive:false}}).addTo(map);xgbLayer=L.imageOverlay(scene.xgboost_src,bounds,{{opacity:1,interactive:false}}).addTo(map);renderScale(scene.range_celsius);xgbLayer.once('load',alignSwipe);cnnLayer.once('load',alignSwipe)}}
       select.addEventListener('change',setScene);swipe.addEventListener('input',applySwipe);setScene();
-      const fit=()=>{{map.invalidateSize();alignSwipe();if(window.frameElement)window.frameElement.style.height=(stage.offsetHeight+4)+'px'}};
+      const setSwipeFromPointer=clientX=>{{const rect=stage.getBoundingClientRect();const localX=clientX-rect.left;const ratio=overlayBox.width>0?(localX-overlayBox.left)/overlayBox.width:.5;swipe.value=String(Math.max(0,Math.min(100,ratio*100)));applySwipe()}};
+      divider.addEventListener('pointerdown',event=>{{event.preventDefault();event.stopPropagation();divider.setPointerCapture?.(event.pointerId);setSwipeFromPointer(event.clientX);
+        const move=next=>{{next.preventDefault();setSwipeFromPointer(next.clientX)}};
+        const end=()=>{{document.removeEventListener('pointermove',move,true);document.removeEventListener('pointerup',end,true)}};
+        document.addEventListener('pointermove',move,true);document.addEventListener('pointerup',end,true);
+      }},true);
+      const fit=()=>{{map.invalidateSize({{pan:false}});alignSwipe();if(window.frameElement)window.frameElement.style.height=(stage.offsetHeight+4)+'px'}};
+      let fittedWhileVisible=false;
+      const ensureBarcelonaFit=()=>{{
+        if(stage.offsetWidth<10||stage.offsetHeight<10)return;
+        map.invalidateSize({{pan:false}});
+        if(!fittedWhileVisible){{map.fitBounds(geographicBounds,{{padding:[24,24],animate:false}});fittedWhileVisible=true}}
+        alignSwipe();
+        if(window.frameElement)window.frameElement.style.height=(stage.offsetHeight+4)+'px';
+      }};
+      const fitAfterLayout=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>fittedWhileVisible?fit():ensureBarcelonaFit()));
       map.on('move zoom resize',alignSwipe);
       const resize=stage.querySelector('.comparison-resize');
       resize.addEventListener('pointerdown',event=>{{event.preventDefault();event.stopPropagation();const sx=event.clientX,sy=event.clientY,sw=stage.offsetWidth,sh=stage.offsetHeight;
@@ -938,7 +954,7 @@ def _model_comparison_html(payload: dict[str, object]) -> str:
         const end=()=>{{document.removeEventListener('pointermove',move,true);document.removeEventListener('pointerup',end,true);localStorage.setItem(storageKey,JSON.stringify({{width:stage.style.width||stage.offsetWidth+'px',height:stage.style.height||stage.offsetHeight+'px'}}));fit()}};
         document.addEventListener('pointermove',move,true);document.addEventListener('pointerup',end,true);
       }},true);
-      window.addEventListener('resize',fit);fit();
+      window.addEventListener('resize',fitAfterLayout);fitAfterLayout();
     </script>
     """
 
@@ -1195,12 +1211,12 @@ def render_thermal_social_priority_map() -> None:
 
 
 def render_modelizacion_visualizacion_slide_deck() -> None:
-    """Estructura: mapa interactivo, HTML y mapa interactivo."""
+    """Estructura: HTML, mapa interactivo y mapa interactivo."""
     with st.container(key="modelizacion_visualizacion_slide_deck"):
         with st.container(key="modelizacion_visualizacion_slide_1"):
-            render_model_comparison_map()
-        with st.container(key="modelizacion_visualizacion_slide_2"):
             render_object_canvas_editor("modelizacion_visualizacion_html")
+        with st.container(key="modelizacion_visualizacion_slide_2"):
+            render_model_comparison_map()
         with st.container(key="modelizacion_visualizacion_slide_3"):
             render_model_error_difference_map()
 

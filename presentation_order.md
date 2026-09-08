@@ -50,8 +50,8 @@ Edita únicamente el número al final de cada pantalla.
 - Resultados
   - Métricas · HTML — 17
   - Visualización
-    - Slide 1 · Predicción XGBoost vs Red CNN — 18
-    - Slide 2 · HTML — 19
+    - Slide 1 · HTML — 18
+    - Slide 2 · Predicción XGBoost vs Red CNN — 19
     - Slide 3 · Diferencia de error CNN vs XGBoost — 0
 
 ## Análisis sociodemográfico

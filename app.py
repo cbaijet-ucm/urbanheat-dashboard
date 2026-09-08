@@ -1,6 +1,8 @@
 """Estructura de navegación para la revisión visual del dashboard."""
 
 from pathlib import Path
+import hashlib
+import hmac
 import sys
 import re
 import unicodedata
@@ -19,22 +21,34 @@ from components.wireframe import SECTION_STRUCTURE, anchor_id, render_parent_pag
 from components.prototype_content import render_slide_navigation
 from data.content_store import ensure_content_store_server
 
+EDITOR_PASSWORD_SHA256 = "ff281492a15f80db594fe7898c7358eb92744c82278d75a2f7de06a32a149855"
+
 st.set_page_config(page_title="UrbanHeat BCN", layout="wide", initial_sidebar_state="expanded")
 ensure_content_store_server()
+if "admin_controls_unlocked" not in st.session_state:
+    st.session_state.admin_controls_unlocked = False
+if "secret_access_requested" not in st.session_state:
+    st.session_state.secret_access_requested = False
+if "secret_access_error" not in st.session_state:
+    st.session_state.secret_access_error = False
 if "edit_mode" not in st.session_state:
-    st.session_state.edit_mode = True
-if "heading_bold" not in st.session_state:
-    st.session_state.heading_bold = False
+    st.session_state.edit_mode = False
 if "presentation_mode" not in st.session_state:
     st.session_state.presentation_mode = False
+if "presentation_toggle" not in st.session_state:
+    st.session_state.presentation_toggle = False
+if not st.session_state.admin_controls_unlocked:
+    st.session_state.edit_mode = False
+    st.session_state.presentation_mode = False
+    st.session_state.presentation_toggle = False
 apply_global_styles()
 st.markdown(
-    f"""
+    """
     <style>
-      .breadcrumb-title, .breadcrumb-title span {{
+      .breadcrumb-title, .breadcrumb-title span {
         font-family: Helvetica, Arial, sans-serif !important;
-        font-weight: {700 if st.session_state.heading_bold else 300} !important;
-      }}
+        font-weight: 300 !important;
+      }
     </style>
     """,
     unsafe_allow_html=True,
@@ -261,13 +275,13 @@ PRESENTATION_TARGETS = {
     "modelizacion / red cnn / entrenamiento": ("Modelización", "Red CNN / Entrenamiento", None),
     "modelizacion / red cnn / arquitectura final": ("Modelización", "Red CNN / Arquitectura final", None),
     "modelizacion / resultados / metricas · html": ("Modelización", "Resultados / Métricas", None),
-    "modelizacion / resultados / visualizacion / slide 1 · prediccion xgboost vs red cnn": ("Modelización", "Resultados / Visualización", 0),
-    "modelizacion / resultados / visualizacion / slide 2 · html": ("Modelización", "Resultados / Visualización", 1),
+    "modelizacion / resultados / visualizacion / slide 1 · html": ("Modelización", "Resultados / Visualización", 0),
+    "modelizacion / resultados / visualizacion / slide 2 · prediccion xgboost vs red cnn": ("Modelización", "Resultados / Visualización", 1),
     "modelizacion / resultados / visualizacion / slide 3 · diferencia de error cnn vs xgboost": ("Modelización", "Resultados / Visualización", 2),
     "analisis sociodemografico / agregacion · mapa interactivo": ("Análisis sociodemográfico", "Agregación", None),
     "analisis sociodemografico / vulnerabilidad · html + mapa interactivo": ("Análisis sociodemográfico", "Vulnerabilidad", None),
-    "sintesis / conclusiones": ("Síntesis", "Conclusiones", None),
-    "sintesis / ir mas alla": ("Síntesis", "Ir más allá", None),
+    "sintesis / conclusiones · html": ("Síntesis", "Conclusiones", None),
+    "sintesis / ir mas alla · html": ("Síntesis", "Ir más allá", None),
 }
 PRESENTATION_TARGETS = {
     _presentation_slug(path): target for path, target in PRESENTATION_TARGETS.items()
@@ -331,16 +345,15 @@ def _apply_presentation_target(target: tuple[int, str, str, int | None]) -> None
 
 
 def enter_presentation_mode() -> None:
-    if not st.session_state.presentation_mode:
-        previous_mode = st.session_state.pop("presentation_previous_edit_mode", None)
-        if previous_mode is not None:
-            st.session_state.edit_mode = previous_mode
-        st.session_state.reload_after_presentation_exit = True
+    """Activa la presentación; el toggle es solo un disparador transitorio."""
+    if not st.session_state.get("presentation_toggle", False):
         return
     plan = _presentation_plan()
     if not plan:
+        st.session_state.presentation_toggle = False
         st.session_state.presentation_mode = False
         return
+    st.session_state.presentation_mode = True
     st.session_state.presentation_previous_edit_mode = st.session_state.edit_mode
     st.session_state.edit_mode = False
     st.session_state.loaded_subsections.update(
@@ -350,8 +363,9 @@ def enter_presentation_mode() -> None:
 
 
 def exit_presentation_mode() -> None:
-    """Callback: Streamlit permite cambiar un widget desde su callback."""
+    """Sale del estado persistente y prepara un reload limpio del dashboard."""
     st.session_state.presentation_mode = False
+    st.session_state.presentation_toggle = False
     st.session_state.edit_mode = st.session_state.pop("presentation_previous_edit_mode", False)
     st.session_state.reload_after_presentation_exit = True
 
@@ -430,13 +444,75 @@ def scroll_to(target: str) -> None:
         width=0,
     )
 
+
+def reveal_secret_access() -> None:
+    st.session_state.secret_access_requested = True
+    st.session_state.secret_access_error = False
+
+
+def unlock_admin_controls() -> None:
+    candidate = st.session_state.get("secret_editor_password", "")
+    digest = hashlib.sha256(candidate.encode("utf-8")).hexdigest()
+    if hmac.compare_digest(digest, EDITOR_PASSWORD_SHA256):
+        st.session_state.admin_controls_unlocked = True
+        st.session_state.secret_access_requested = False
+        st.session_state.secret_access_error = False
+        st.session_state.edit_mode = True
+        st.session_state.presentation_mode = False
+        st.session_state.presentation_toggle = False
+        st.session_state.secret_editor_password = ""
+        return
+    st.session_state.secret_access_error = True
+
+
 with st.sidebar:
     logo = Path(__file__).resolve().parent / "assets" / "graphic" / "Logo.png"
     if logo.exists():
-        st.image(str(logo), width="stretch")
-    if st.session_state.edit_mode:
-        with st.container(key="heading_font_controls"):
-            st.toggle("Bold", key="heading_bold")
+        with st.container(key="sidebar_logo"):
+            st.image(str(logo), width="stretch")
+        st.button(
+            "Abrir acceso privado",
+            key="secret_access_trigger",
+            on_click=reveal_secret_access,
+        )
+        components.html(
+            """
+            <script>
+              const root = window.parent.document;
+              const bindSecretLogoAccess = () => {
+                const logo = root.querySelector('.st-key-sidebar_logo img');
+                if (!logo || logo.dataset.urbanheatSecretAccessBound === 'true') return;
+                logo.dataset.urbanheatSecretAccessBound = 'true';
+                let clicks = [];
+                logo.addEventListener('click', () => {
+                  const now = Date.now();
+                  clicks = clicks.filter((time) => now - time < 900);
+                  clicks.push(now);
+                  if (clicks.length < 3) return;
+                  clicks = [];
+                  root.querySelector('.st-key-secret_access_trigger button')?.click();
+                });
+              };
+              bindSecretLogoAccess();
+              window.parent.__urbanheatSecretAccessObserver?.disconnect();
+              window.parent.__urbanheatSecretAccessObserver = new MutationObserver(bindSecretLogoAccess);
+              window.parent.__urbanheatSecretAccessObserver.observe(root.body, {childList:true, subtree:true});
+            </script>
+            """,
+            height=0,
+            width=0,
+        )
+    if st.session_state.secret_access_requested and not st.session_state.admin_controls_unlocked:
+        with st.container(key="secret_access_panel"):
+            st.text_input(
+                "Contraseña",
+                type="password",
+                key="secret_editor_password",
+                on_change=unlock_admin_controls,
+            )
+            st.button("Entrar", key="secret_access_submit", on_click=unlock_admin_controls)
+            if st.session_state.secret_access_error:
+                st.error("Contraseña incorrecta")
     for section in sections:
         with st.expander(section, expanded=section == st.session_state.active_section):
             shown_nested_parents: set[str] = set()
@@ -537,10 +613,11 @@ with st.container(key="route_header"):
                 unsafe_allow_html=True,
             )
     with mode_column:
-        with st.container(key="mode_toggle"):
-            if not st.session_state.presentation_mode:
-                st.toggle("Edición", key="edit_mode")
-            st.toggle("Presentación", key="presentation_mode", on_change=enter_presentation_mode)
+        if st.session_state.admin_controls_unlocked:
+            with st.container(key="mode_toggle"):
+                if not st.session_state.presentation_mode:
+                    st.toggle("Edición", key="edit_mode")
+                    st.toggle("Presentación", key="presentation_toggle", on_change=enter_presentation_mode)
     with controls_column:
         if not st.session_state.presentation_mode:
             up, down, left, right = st.columns(4, gap="small")
@@ -592,6 +669,35 @@ if st.session_state.presentation_mode:
           const plan=__PRESENTATION_PLAN__;
           const parentWindow=window.parent;
           const state={index:0,busy:false};
+          const warmFrame=(frame)=>{
+            frame.loading='eager';
+            const warm=()=>{try{
+              const doc=frame.contentDocument;
+              if(!doc) return;
+              doc.querySelectorAll('img').forEach(image=>{
+                image.loading='eager';
+                if(image.src && !image.src.startsWith('data:')) fetch(image.src,{cache:'force-cache'}).catch(()=>{});
+                image.decode?.().catch(()=>{});
+              });
+              frame.contentWindow.dispatchEvent(new Event('resize'));
+            }catch(_){}};
+            if(frame.dataset.urbanheatPresentationWarmBound!=='true'){
+              frame.dataset.urbanheatPresentationWarmBound='true';
+              frame.addEventListener('load',warm);
+            }
+            warm();
+          };
+          const warmAllContent=()=>{
+            plan.forEach(item=>{
+              const anchor=root.getElementById(item.anchor);
+              const screen=anchor?.closest('[class*="st-key-screen_"]') || anchor?.parentElement;
+              screen?.querySelectorAll('iframe').forEach(warmFrame);
+              screen?.querySelectorAll('img').forEach(image=>{
+                image.loading='eager';
+                image.decode?.().catch(()=>{});
+              });
+            });
+          };
           const isScrollable=(node)=>{
             const style=parentWindow.getComputedStyle(node);
             return /(auto|scroll)/.test(style.overflowY) && node.scrollHeight>node.clientHeight;
@@ -714,6 +820,7 @@ if st.session_state.presentation_mode:
           };
           const initializeContent=()=>{
             if(!plan.length || !plan.every(item=>root.getElementById(item.anchor))) return;
+            warmAllContent();
             const initializedDecks=new Set();
             plan.forEach(item=>{
               if(item.deck_prefix && !initializedDecks.has(item.deck_prefix)){
@@ -981,7 +1088,7 @@ components.html(
       let presentationStyle = root.getElementById(presentationStyleId);
       if (!presentationStyle) { presentationStyle = root.createElement('style'); presentationStyle.id = presentationStyleId; root.head.appendChild(presentationStyle); }
       presentationStyle.textContent = presentation
-        ? 'html[data-urbanheat-presentation="true"] [data-testid="stSidebar"],html[data-urbanheat-presentation="true"] .st-key-sidebar_reopen,html[data-urbanheat-presentation="true"] .st-key-layout_left_guide,html[data-urbanheat-presentation="true"] .st-key-slide_navigation,html[data-urbanheat-presentation="true"] [class*="st-key-presentation_exit_"]{display:none!important} html[data-urbanheat-presentation="true"] [data-testid="stMain"]{margin-left:0!important;width:100%!important;max-width:none!important}'
+        ? 'html[data-urbanheat-presentation="true"] [data-testid="stSidebar"],html[data-urbanheat-presentation="true"] .st-key-sidebar_reopen,html[data-urbanheat-presentation="true"] .st-key-layout_left_guide,html[data-urbanheat-presentation="true"] .st-key-mode_toggle,html[data-urbanheat-presentation="true"] .st-key-slide_navigation,html[data-urbanheat-presentation="true"] [class*="st-key-presentation_exit_"]{display:none!important} html[data-urbanheat-presentation="true"] [data-testid="stMain"]{margin-left:0!important;width:100%!important;max-width:none!important}'
         : '';
       const styleId = 'urbanheat-render-mode-style';
       const css = 'html[data-urbanheat-mode="render"] #urbanheat-left-guide, html[data-urbanheat-mode="render"] .urbanheat-content-move-handle { display:none !important; }';
