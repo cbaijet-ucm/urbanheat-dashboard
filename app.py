@@ -331,6 +331,8 @@ def load_presentation_plan(markdown_mtime_ns: int) -> list[tuple[int, str, str, 
 
 def _presentation_plan() -> list[tuple[int, str, str, int | None]]:
     markdown = APP_DIR / "presentation_order.md"
+    if not markdown.is_file():
+        return []
     return load_presentation_plan(markdown.stat().st_mtime_ns)
 
 

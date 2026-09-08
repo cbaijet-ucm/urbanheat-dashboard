@@ -18,7 +18,6 @@ venv/
 Thumbs.db
 
 # Assets gráficos
-assets/graphic/
 assets/UrbanHeat_BCN_Inventario_assets.xlsx
 
 # Variantes obsoletas conservadas únicamente en local
@@ -27,6 +26,9 @@ static/meteo/**/*.webp
 
 # Presentacion
 presentation_order.md
+
+# Documentación de iteraciones y funcionalidades no desplegadas
+docs/*.md
 
 # Acceso privado al editor
 PRIVATE_EDITOR_ACCESS.md
