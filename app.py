@@ -38,10 +38,10 @@ if "presentation_mode" not in st.session_state:
     st.session_state.presentation_mode = False
 if "presentation_toggle" not in st.session_state:
     st.session_state.presentation_toggle = False
+st.session_state.presentation_mode = False
+st.session_state.presentation_toggle = False
 if not st.session_state.admin_controls_unlocked:
     st.session_state.edit_mode = False
-    st.session_state.presentation_mode = False
-    st.session_state.presentation_toggle = False
 apply_global_styles()
 st.markdown(
     """
@@ -205,9 +205,11 @@ sections = list(SECTION_STRUCTURE)
 
 if "active_section" not in st.session_state:
     st.session_state.active_section = "Introducción"
-    st.session_state.active_subsection = "Portada"
-    st.session_state.loaded_subsections = {("Introducción", "Portada")}
-    st.session_state.scroll_target = anchor_id("Introducción", "Portada")
+    st.session_state.active_subsection = "Scope"
+    st.session_state.loaded_subsections = {("Introducción", "Scope")}
+    st.session_state.scroll_target = anchor_id("Introducción", "Scope")
+if "scope_sequence_visit" not in st.session_state:
+    st.session_state.scope_sequence_visit = 1
 
 # Migra rutas guardadas de versiones anteriores de la estructura.
 if st.session_state.get("active_section") == "Datos":
@@ -222,6 +224,13 @@ if st.session_state.get("active_section") == "Datos":
 if (
     st.session_state.get("active_section") == "Introducción"
     and st.session_state.get("active_subsection") in {"Scope y Motivación", "Motivación"}
+):
+    st.session_state.active_subsection = "Scope"
+    st.session_state.loaded_subsections.add(("Introducción", "Scope"))
+    st.session_state.scroll_target = anchor_id("Introducción", "Scope")
+elif (
+    st.session_state.get("active_section") == "Introducción"
+    and st.session_state.get("active_subsection") not in SECTION_STRUCTURE["Introducción"]
 ):
     st.session_state.active_subsection = "Scope"
     st.session_state.loaded_subsections.add(("Introducción", "Scope"))
@@ -306,6 +315,8 @@ def go_to(section: str, subsection: str) -> None:
     st.session_state.loaded_subsections.add((section, subsection))
     st.session_state.scroll_target = anchor_id(section, subsection)
     st.session_state.normal_initial_slide = 0
+    if section == "Introducción" and subsection == "Scope":
+        st.session_state.scope_sequence_visit += 1
     if section == "Dataset" and subsection == "Predictores / Distancias":
         st.session_state.distancias_slide_index = 0
     if section == "Dataset" and subsection == "Predictores / Meteo":
@@ -341,9 +352,7 @@ def _presentation_slug(value: str) -> str:
 
 
 PRESENTATION_TARGETS = {
-    "introduccion / portada": ("Introducción", "Portada", None),
-    "introduccion / scope / slide 1 · scope": ("Introducción", "Scope", 0),
-    "introduccion / scope / slide 2 · motivacion": ("Introducción", "Scope", 1),
+    "introduccion / scope": ("Introducción", "Scope", None),
     "introduccion / pipeline": ("Introducción", "Pipeline", None),
     "introduccion / stack tecnologico": ("Introducción", "Stack tecnológico", None),
     "dataset / area de estudio": ("Dataset", "Área de estudio", None),
@@ -379,7 +388,6 @@ PRESENTATION_TARGETS = {
 }
 
 PRESENTATION_DECKS = {
-    ("Introducción", "Scope"): ("scope_motivation_slide", 2),
     ("Dataset", "Target LST"): ("target_lst_slide", 2),
     ("Dataset", "Predictores / Topomorfológicas"): ("topomorfologicas_slide", 2),
     ("Dataset", "Predictores / Land cover"): ("land_cover_slide", 2),
@@ -507,11 +515,10 @@ def scroll_to(target: str) -> None:
             const isDocumentScroller = scroller === parentDocument.scrollingElement;
             const current = scroller.scrollTop;
             const containerTop = isDocumentScroller ? 0 : scroller.getBoundingClientRect().top;
-            const header = parentDocument.querySelector('.st-key-route_header');
-            const offset = target.id === 'route-introduccion-portada' && header
-              ? header.getBoundingClientRect().bottom
-              : 74;
-            const destination = current + target.getBoundingClientRect().top - containerTop - offset;
+            const scopeEditor = target.id === 'route-introduccion-scope'
+              ? Array.from(target.closest('[class*="st-key-screen_"]')?.querySelectorAll('iframe') || []).find(frame => frame.getBoundingClientRect().height > 500)
+              : null;
+            const destination = current + (scopeEditor || target).getBoundingClientRect().top - containerTop - 74;
             const distance = destination - current;
             const duration = {30 if st.session_state.presentation_mode else "Math.min(360, Math.max(160, Math.abs(distance) * 0.09))"};
             const startedAt = performance.now();
@@ -521,11 +528,6 @@ def scroll_to(target: str) -> None:
               scroller.scrollTop = current + distance * eased;
               if (progress < 1) {{
                 requestAnimationFrame(tick);
-              }} else if (target.id === 'route-introduccion-portada' && header) {{
-                requestAnimationFrame(() => requestAnimationFrame(() => {{
-                  const correction = target.getBoundingClientRect().top - header.getBoundingClientRect().bottom;
-                  scroller.scrollTop += correction;
-                }}));
               }}
             }};
             requestAnimationFrame(tick);
@@ -706,11 +708,7 @@ with st.container(key="route_header"):
                 unsafe_allow_html=True,
             )
     with mode_column:
-        if st.session_state.admin_controls_unlocked:
-            with st.container(key="mode_toggle"):
-                if not st.session_state.presentation_mode:
-                    st.toggle("Edición", key="edit_mode")
-                    st.toggle("Presentación", key="presentation_toggle", on_change=enter_presentation_mode)
+        pass
     with controls_column:
         if not st.session_state.presentation_mode:
             up, down, left, right = st.columns(4, gap="small")
@@ -724,6 +722,10 @@ with st.container(key="route_header"):
                 _navigation_button("→", "right", current_route, next_section)
 
 if st.session_state.presentation_mode:
+    st.markdown(
+        "<style>.st-key-route_header button,.st-key-slide_navigation{display:none!important}</style>",
+        unsafe_allow_html=True,
+    )
     presentation_plan = _presentation_plan()
     for exit_index in range(len(presentation_plan)):
         with st.container(key=f"presentation_exit_{exit_index}"):
@@ -761,7 +763,7 @@ if st.session_state.presentation_mode:
           const root=window.parent.document;
           const plan=__PRESENTATION_PLAN__;
           const parentWindow=window.parent;
-          const state={index:0,busy:false};
+          const state={index:0,busy:false,scopeSequenceClicks:0,scopeSequenceClickLimit:2};
           const warmFrame=(frame)=>{
             frame.loading='eager';
             const warm=()=>{try{
@@ -794,6 +796,37 @@ if st.session_state.presentation_mode:
           const isScrollable=(node)=>{
             const style=parentWindow.getComputedStyle(node);
             return /(auto|scroll)/.test(style.overflowY) && node.scrollHeight>node.clientHeight;
+          };
+          const scopeSequenceFrame=()=>{
+            const first=plan[0];
+            if(!first || first.section!=='Introducción' || first.subsection!=='Scope') return null;
+            const anchor=root.getElementById(first.anchor);
+            const screen=anchor?.closest('[class*="st-key-screen_"]') || anchor?.parentElement;
+            return Array.from(screen?.querySelectorAll('iframe') || []).find(frame=>frame.dataset.urbanheatSequenceReady==='scope'||frame.getBoundingClientRect().height>500) || null;
+          };
+          const sendScopeSequenceStep=()=>{
+            const frame=scopeSequenceFrame();
+            if(!frame) return false;
+            const send=()=>{try{frame.contentWindow?.postMessage({type:'urbanheat-sequence-advance'},'*')}catch(_){}};
+            if(frame.dataset.urbanheatSequenceReady==='scope'){
+              send();
+            }else{
+              frame.dataset.urbanheatSequencePending=String((Number(frame.dataset.urbanheatSequencePending)||0)+1);
+              window.setTimeout(()=>{
+                if(frame.dataset.urbanheatSequenceReady==='scope'){
+                  const pending=Number(frame.dataset.urbanheatSequencePending)||0;
+                  frame.dataset.urbanheatSequencePending='0';
+                  for(let index=0;index<pending;index+=1)send();
+                }
+              },50);
+            }
+            return true;
+          };
+          const resetScopeSequence=()=>{
+            const frame=scopeSequenceFrame();
+            if(!frame) return;
+            frame.dataset.urbanheatSequencePending='0';
+            try{frame.contentWindow?.postMessage({type:'urbanheat-sequence-reset'},'*')}catch(_){}
           };
           const showSlide=(item)=>{
             if(!item.deck_prefix || item.slide===null) return;
@@ -881,7 +914,6 @@ if st.session_state.presentation_mode:
               root.removeEventListener('click',root.__urbanheatPresentationClickCapture,true);
             }
             root.__urbanheatPresentationClickCapture=(event)=>{
-              if(root.documentElement.dataset.urbanheatPresentation!=='true') return;
               if(event.target.closest('.st-key-mode_toggle')){
                 event.preventDefault();
                 event.stopImmediatePropagation();
@@ -890,9 +922,13 @@ if st.session_state.presentation_mode:
               }
               const header=root.querySelector('.st-key-route_header');
               if(!header || !header.contains(event.target)) return;
-              if(event.target.closest('button,input,label,select,a,iframe')) return;
+              if(event.target.closest('input,label,select,a,iframe')) return;
               event.preventDefault();
               event.stopImmediatePropagation();
+              if(state.index===0 && state.scopeSequenceClicks<state.scopeSequenceClickLimit && sendScopeSequenceStep()){
+                state.scopeSequenceClicks+=1;
+                return;
+              }
               advance();
             };
             root.addEventListener('click',root.__urbanheatPresentationClickCapture,true);
@@ -921,6 +957,8 @@ if st.session_state.presentation_mode:
               }
             });
             settle(plan[0],0);
+            state.scopeSequenceClicks=0;
+            resetScopeSequence();
             contentObserver.disconnect();
           };
           const contentObserver=new MutationObserver(initializeContent);
@@ -936,8 +974,6 @@ if st.session_state.presentation_mode:
 slide_navigation = None
 if current_section == "Dataset" and current_subsection == "Target LST":
     slide_navigation = ("st-key-target_lst_slide_deck", "st-key-target_lst_slide_", 2)
-elif current_section == "Introducción" and current_subsection == "Scope":
-    slide_navigation = ("st-key-scope_motivation_slide_deck", "st-key-scope_motivation_slide_", 2)
 elif current_section == "Dataset" and current_subsection == "Predictores / Topomorfológicas":
     slide_navigation = ("st-key-topomorfologicas_slide_deck", "st-key-topomorfologicas_slide_", 2)
 elif current_section == "Dataset" and current_subsection == "Predictores / Land cover":
@@ -1138,6 +1174,77 @@ components.html(
     width=0,
 )
 
+# La entrada muestra Scope sin interacción: espera la carga del lienzo y
+# reproduce sus dos primeros pasos antes de habilitar la navegación.
+if (
+    not st.session_state.edit_mode
+    and current_section == "Introducción"
+    and current_subsection == "Scope"
+):
+    components.html(
+        """
+        <script>
+          const root=window.parent.document;
+          const parentWindow=window.parent;
+          const state=root.documentElement.dataset;
+          const lockKey='urbanheatIntroSequence';
+          const visit='__SCOPE_SEQUENCE_VISIT__';
+          const styleId='urbanheat-intro-sequence-style';
+          const addStyle=()=>{
+            let style=root.getElementById(styleId);
+            if(!style){style=root.createElement('style');style.id=styleId;root.head.appendChild(style)}
+            style.textContent='html[data-urbanheat-intro-sequence^="running:"] .st-key-route_header button{display:none!important}';
+          };
+          const blocker=event=>{
+            if(!state[lockKey]?.startsWith('running:'))return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          };
+          const lock=()=>{
+            state[lockKey]='running:'+visit;
+            addStyle();
+            root.addEventListener('pointerdown',blocker,true);
+            root.addEventListener('click',blocker,true);
+          };
+          const unlock=()=>{
+            state[lockKey]='done:'+visit;
+            root.removeEventListener('pointerdown',blocker,true);
+            root.removeEventListener('click',blocker,true);
+          };
+          const scopeFrame=()=>{
+            const anchor=root.getElementById('route-introduccion-scope');
+            const screen=anchor?.closest('[class*="st-key-screen_"]')||anchor?.parentElement;
+            return Array.from(screen?.querySelectorAll('iframe')||[]).find(frame=>frame.dataset.urbanheatSequenceReady==='scope'||frame.getBoundingClientRect().height>500)||null;
+          };
+          const advanceScope=()=>{
+            const frame=scopeFrame();
+            if(!frame)return false;
+            try{frame.contentWindow?.postMessage({type:'urbanheat-sequence-advance'},'*');return true}catch(_){return false}
+          };
+          const start=()=>{
+            if(state[lockKey]==='done:'+visit||state[lockKey]==='running:'+visit)return;
+            lock();
+            const awaitScope=()=>{
+              const frame=scopeFrame();
+              if(!frame||frame.dataset.urbanheatSequenceReady!=='scope'){
+                window.setTimeout(awaitScope,100);
+                return;
+              }
+              try{frame.contentWindow?.postMessage({type:'urbanheat-sequence-reset'},'*')}catch(_){}
+              window.setTimeout(()=>{
+                advanceScope();
+                window.setTimeout(()=>{advanceScope();unlock()},5000);
+              },5000);
+            };
+            awaitScope();
+          };
+          start();
+        </script>
+        """.replace("__SCOPE_SEQUENCE_VISIT__", str(st.session_state.scope_sequence_visit)),
+        height=0,
+        width=0,
+    )
+
 # Edición muestra las guías y controles; Renderizado deja únicamente el
 # contenido persistido. Las posiciones no se modifican al cambiar de modo.
 mode_value = "render" if st.session_state.presentation_mode else ("edit" if st.session_state.edit_mode else "render")
@@ -1181,7 +1288,7 @@ components.html(
       let presentationStyle = root.getElementById(presentationStyleId);
       if (!presentationStyle) { presentationStyle = root.createElement('style'); presentationStyle.id = presentationStyleId; root.head.appendChild(presentationStyle); }
       presentationStyle.textContent = presentation
-        ? 'html[data-urbanheat-presentation="true"] [data-testid="stSidebar"],html[data-urbanheat-presentation="true"] .st-key-sidebar_reopen,html[data-urbanheat-presentation="true"] .st-key-layout_left_guide,html[data-urbanheat-presentation="true"] .st-key-mode_toggle,html[data-urbanheat-presentation="true"] .st-key-slide_navigation,html[data-urbanheat-presentation="true"] [class*="st-key-presentation_exit_"]{display:none!important} html[data-urbanheat-presentation="true"] [data-testid="stMain"]{margin-left:0!important;width:100%!important;max-width:none!important}'
+        ? 'html[data-urbanheat-presentation="true"] [data-testid="stSidebar"],html[data-urbanheat-presentation="true"] .st-key-sidebar_reopen,html[data-urbanheat-presentation="true"] .st-key-layout_left_guide,html[data-urbanheat-presentation="true"] .st-key-mode_toggle,html[data-urbanheat-presentation="true"] .st-key-slide_navigation,html[data-urbanheat-presentation="true"] [class*="st-key-presentation_exit_"],html[data-urbanheat-presentation="true"] .st-key-route_header button{display:none!important} html[data-urbanheat-presentation="true"] [data-testid="stMain"]{margin-left:0!important;width:100%!important;max-width:none!important}'
         : '';
       const styleId = 'urbanheat-render-mode-style';
       const css = 'html[data-urbanheat-mode="render"] #urbanheat-left-guide, html[data-urbanheat-mode="render"] .urbanheat-content-move-handle { display:none !important; }';
@@ -1212,6 +1319,7 @@ components.html(
           const doc = frame.contentDocument;
           if (!doc) return;
           doc.body.classList.toggle('urbanheat-render-mode', mode === 'render');
+          doc.body.dataset.urbanheatPresentation = String(presentation);
           let style = doc.getElementById('urbanheat-frame-mode-style');
           if (!style) { style = doc.createElement('style'); style.id = 'urbanheat-frame-mode-style'; doc.head.appendChild(style); }
           style.textContent = frameCss;

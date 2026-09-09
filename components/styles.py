@@ -87,7 +87,6 @@ def apply_global_styles() -> None:
     .subsection-anchor {scroll-margin-top: 6rem; height: 1px;}
     [class*="st-key-screen_"], .element-container:has([class*="st-key-screen_"]) {min-height: 115vh !important; padding: 0;}
     .element-container:has([class*="st-key-screen_"]) {margin-top: 0 !important;}
-    .element-container:has(.st-key-screen_route_introduccion_portada) {margin-top: 0;}
     .subsection-block {border-top: 1px solid #d8d8d8; padding-top: 1.25rem; margin-top: 0;}
     .subsection-block h2, .deferred-block h2 {font-size: clamp(1.7rem, 2.2vw, 2.35rem) !important; margin: 0 0 1rem !important; border: 0 !important; padding: 0 !important;}
     .subsection-active {border-top-color: #161616;}
@@ -95,8 +94,6 @@ def apply_global_styles() -> None:
     .deferred-block h2 {color: #767676 !important;}
     .deferred-rule {height: 1px; width: 24%; background: #ededed;}
     .explicit-screen-gap {height: 450vh !important; width: 100%; pointer-events: none;}
-    .st-key-scope_motivation_slide_deck {position: relative !important; overflow: visible !important;}
-    .st-key-scope_motivation_slide_2 {display: none;}
     .st-key-target_lst_slide_deck {position: relative !important; overflow: visible !important;}
     .st-key-target_lst_slide_2 {display: none;}
     .st-key-topomorfologicas_slide_deck {position: relative !important; overflow: visible !important;}

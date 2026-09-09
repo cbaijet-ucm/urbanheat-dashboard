@@ -47,7 +47,7 @@ def test_vulnerability_hybrid_renders_without_slide_navigation() -> None:
     app = AppTest.from_file(str(DASHBOARD_DIR / "app.py"))
     app.run(timeout=60)
     for button_key in (
-        "navigate_right_route-introduccion-portada",
+        "navigate_right_route-introduccion-scope",
         "navigate_right_route-dataset-area-de-estudio",
         "navigate_right_route-modelizacion-metodologia",
         "navigate_down_route-analisis-sociodemografico-agregacion",

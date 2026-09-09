@@ -5,12 +5,11 @@ import unicodedata
 
 from components.prototype_content import (
     render_cell_scene_table,
-    render_cover_image,
     render_object_canvas_editor,
     render_pipeline_image,
     render_sentinel_indices_interactive,
     render_meteo_slide_deck,
-    render_scope_motivation_slide_deck,
+    render_scope_slide,
     render_target_lst_slide_deck,
     render_topomorphological_slide_deck,
     render_land_cover_slide_deck,
@@ -24,8 +23,7 @@ from components.prototype_content import (
 
 SECTION_STRUCTURE = {
     "Introducción": {
-        "Portada": "Texto",
-        "Scope": "HTML · 2 slides",
+        "Scope": "HTML",
         "Pipeline": "Infografía / imagen fija",
         "Stack tecnológico": "HTML",
     },
@@ -110,15 +108,10 @@ def render_parent_page(
 
             state = " subsection-active" if is_active else ""
 
-            if section == "Introducción" and subsection == "Portada":
-                with st.container(key="movable_cover_image"):
-                    render_cover_image()
-                continue
-
             if section == "Introducción" and subsection == "Scope":
-                with st.container(key="movable_scope_motivation_slides"):
+                with st.container(key="movable_scope_slide"):
                     _subsection_header(subsection, state, is_active)
-                    render_scope_motivation_slide_deck()
+                    render_scope_slide()
                 continue
             if section == "Introducción" and subsection == "Pipeline":
                 with st.container(key="movable_pipeline_figure"):
